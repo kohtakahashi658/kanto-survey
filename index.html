@@ -3,404 +3,342 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>関東観光地トーナメント</title>
+  <title>群馬観光チェックリスト</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
-      background: linear-gradient(135deg, #e0f2fe 0%, #fef9c3 100%);
+      background: #f1f5f9;
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
+      padding: 20px 16px 40px;
     }
 
-    .card {
-      background: white;
-      border-radius: 24px;
-      padding: 36px 32px;
-      max-width: 560px;
-      width: 100%;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.13);
-    }
-
-    /* Header */
-    .header { text-align: center; margin-bottom: 28px; }
-    .header h1 { font-size: 1.3rem; color: #1e3a5f; margin-bottom: 4px; }
-    .header .desc { font-size: 0.85rem; color: #64748b; }
+    header { text-align: center; padding: 20px 0 24px; }
+    header h1 { font-size: 1.5rem; color: #1e3a5f; margin-bottom: 4px; }
+    header p  { font-size: 0.85rem; color: #64748b; }
 
     /* Progress */
-    .progress-wrap { margin-bottom: 28px; }
-    .progress-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.78rem;
-      color: #94a3b8;
-      margin-bottom: 6px;
-    }
-    .progress-bar-bg {
-      height: 6px;
-      background: #e2e8f0;
-      border-radius: 99px;
-      overflow: hidden;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #3b82f6, #818cf8);
-      border-radius: 99px;
-      transition: width 0.4s ease;
-    }
+    .prog-wrap { max-width: 500px; margin: 0 auto 24px; }
+    .prog-top { display: flex; justify-content: space-between; font-size: 0.78rem; color: #64748b; margin-bottom: 6px; }
+    .prog-bg  { height: 8px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #16a34a); border-radius: 99px; transition: width 0.4s ease; }
 
-    /* VS section */
-    .vs-label {
-      text-align: center;
-      font-size: 0.8rem;
-      font-weight: bold;
-      color: #94a3b8;
-      letter-spacing: 0.1em;
-      margin-bottom: 14px;
+    /* Filter tabs */
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px; }
+    .filter-btn {
+      border: 1.5px solid #e2e8f0; border-radius: 20px;
+      padding: 6px 16px; font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; background: white; color: #64748b;
+      transition: all 0.15s;
     }
+    .filter-btn.active { background: #1e3a5f; color: white; border-color: #1e3a5f; }
 
-    .choices {
+    /* Grid */
+    .grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      max-width: 960px;
+      margin: 0 auto;
     }
 
-    .choice-btn {
-      border: 2.5px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 20px 14px;
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.15s ease;
+    /* Card */
+    .spot-card {
       background: white;
-      position: relative;
+      border-radius: 16px;
       overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      transition: transform 0.15s, box-shadow 0.15s;
+      cursor: pointer;
+      position: relative;
+      user-select: none;
+    }
+    .spot-card:hover { transform: translateY(-3px); box-shadow: 0 6px 24px rgba(0,0,0,0.13); }
+
+    /* Photo area */
+    .photo {
+      width: 100%; height: 180px;
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .photo-emoji { font-size: 4.5rem; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.25)); }
+
+    /* Category badge */
+    .cat-badge {
+      position: absolute; top: 10px; left: 10px;
+      background: rgba(0,0,0,0.45);
+      color: white; font-size: 0.72rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 20px;
     }
 
-    .choice-btn:hover {
-      border-color: #3b82f6;
-      background: #eff6ff;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(59,130,246,0.15);
-    }
-
-    .choice-btn:active { transform: scale(0.97); }
-
-    .choice-btn .emoji { font-size: 2.4rem; display: block; margin-bottom: 10px; }
-    .choice-btn .name { font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
-    .choice-btn .pref { font-size: 0.75rem; color: #3b82f6; font-weight: 600; margin-bottom: 6px; }
-    .choice-btn .note { font-size: 0.78rem; color: #64748b; line-height: 1.5; }
-
-    .vs-divider {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.9rem;
-      font-weight: 900;
-      color: #cbd5e1;
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-    }
-
-    .choices-wrap { position: relative; }
-
-    .vs-badge {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      background: #f1f5f9;
+    /* Check button (top-right) */
+    .check-btn {
+      position: absolute; top: 10px; right: 10px;
+      width: 30px; height: 30px;
+      background: rgba(255,255,255,0.9);
       border: 2px solid #e2e8f0;
       border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.7rem;
-      font-weight: 900;
-      color: #94a3b8;
-      z-index: 10;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 900;
+      transition: all 0.15s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      color: transparent;
+    }
+    .spot-card.checked .check-btn {
+      background: #22c55e;
+      border-color: #22c55e;
+      color: white;
+    }
+
+    /* Checked tint */
+    .spot-card.checked .photo::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: rgba(34,197,94,0.2);
       pointer-events: none;
     }
 
-    /* Round badge */
-    .round-badge {
-      text-align: center;
-      margin-bottom: 8px;
-    }
-    .round-badge span {
-      display: inline-block;
-      background: #eff6ff;
-      color: #3b82f6;
-      font-size: 0.78rem;
-      font-weight: 700;
-      padding: 3px 12px;
-      border-radius: 20px;
-      border: 1px solid #bfdbfe;
-    }
+    /* Info */
+    .info { padding: 14px 16px 16px; }
+    .spot-name { font-size: 1.05rem; font-weight: 800; color: #1e293b; margin-bottom: 2px; }
+    .spot-area { font-size: 0.75rem; color: #94a3b8; margin-bottom: 8px; }
+    .spot-desc { font-size: 0.82rem; color: #475569; line-height: 1.6; }
 
-    /* Result */
-    .result { display: none; text-align: center; }
-    .result.show { display: block; }
-
-    .result-emoji { font-size: 4rem; margin-bottom: 12px; }
-    .result h2 { font-size: 1.5rem; color: #1e3a5f; margin-bottom: 6px; }
-    .result .pref-name {
-      font-size: 2.2rem;
-      font-weight: 900;
-      color: #3b82f6;
-      margin: 16px 0 8px;
-      letter-spacing: 0.05em;
+    /* Reset */
+    .reset-wrap { text-align: center; margin-top: 28px; }
+    .reset-btn {
+      background: none; border: 1.5px solid #cbd5e1;
+      color: #64748b; border-radius: 10px;
+      padding: 8px 24px; font-size: 0.85rem; cursor: pointer;
+      transition: all 0.15s;
     }
-    .result .spot-name { font-size: 1rem; color: #475569; margin-bottom: 6px; }
-    .result .result-note {
-      font-size: 0.85rem;
-      color: #64748b;
-      background: #f8fafc;
-      border-radius: 12px;
-      padding: 14px 18px;
-      margin: 16px 0 24px;
-      line-height: 1.7;
-    }
+    .reset-btn:hover { border-color: #94a3b8; color: #334155; }
 
-    .retry-btn {
-      background: #3b82f6;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 12px 32px;
-      font-size: 0.95rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
-    }
-    .retry-btn:hover { background: #2563eb; }
-    .retry-btn:active { transform: scale(0.97); }
-
-    /* Animate in */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .animate { animation: fadeUp 0.3s ease; }
-
-    .form-section.hide { display: none; }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
-<div class="card">
 
-  <!-- Quiz -->
-  <div class="form-section" id="quizSection">
-    <div class="header">
-      <h1>関東観光地トーナメント</h1>
-      <div class="desc">どちらに行きたいか選んで、最終目的地を決めよう！</div>
-    </div>
+<header>
+  <h1>🌿 群馬観光チェックリスト</h1>
+  <p>行きたいスポットをタップしてチェック！</p>
+</header>
 
-    <div class="progress-wrap">
-      <div class="progress-label">
-        <span id="stepLabel">第1問</span>
-        <span id="stepCount">1 / 7</span>
-      </div>
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
-      </div>
-    </div>
-
-    <div class="round-badge"><span id="roundLabel">1回戦</span></div>
-    <div class="vs-label">どちらに行きたい？</div>
-
-    <div class="choices-wrap">
-      <div class="choices animate" id="choicesEl">
-        <div class="choice-btn" id="choiceA" onclick="choose(0)"></div>
-        <div class="choice-btn" id="choiceB" onclick="choose(1)"></div>
-      </div>
-      <div class="vs-badge">VS</div>
-    </div>
+<div class="prog-wrap">
+  <div class="prog-top">
+    <span id="checkedCount">0 / 10 チェック済み</span>
+    <span id="checkedPct">0%</span>
   </div>
+  <div class="prog-bg"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+</div>
 
-  <!-- Result -->
-  <div class="result" id="resultSection">
-    <div class="result-emoji" id="resultEmoji"></div>
-    <h2>あなたにおすすめの行き先は</h2>
-    <div class="pref-name" id="resultPref"></div>
-    <div class="spot-name" id="resultSpot"></div>
-    <div class="result-note" id="resultNote"></div>
-    <button class="retry-btn" onclick="reset()">もう一度やる</button>
-  </div>
+<div class="filters">
+  <button class="filter-btn active" onclick="filterBy('all',this)">すべて</button>
+  <button class="filter-btn" onclick="filterBy('温泉',this)">♨️ 温泉</button>
+  <button class="filter-btn" onclick="filterBy('自然',this)">🏔️ 自然</button>
+  <button class="filter-btn" onclick="filterBy('世界遺産',this)">🏛️ 世界遺産</button>
+  <button class="filter-btn" onclick="filterBy('アクティビティ',this)">🎿 アクティビティ</button>
+</div>
 
+<div class="grid" id="grid"></div>
+
+<div class="reset-wrap">
+  <button class="reset-btn" onclick="resetAll()">チェックをリセット</button>
 </div>
 
 <script>
-  // 8 destinations (perfect bracket: 8→4→2→1 = 7 questions)
-  const SPOTS = [
-    {
-      name: '浅草・上野・渋谷',
-      emoji: '🗼',
-      pref: '東京都',
-      note: '下町文化から最先端まで。食・ショッピング・観光が何でも揃う',
-      tags: ['グルメ','ショッピング','文化']
-    },
-    {
-      name: '秋葉原・お台場・新宿',
-      emoji: '🏙️',
-      pref: '東京都',
-      note: 'ポップカルチャー・夜景・大型施設。都会を満喫したい人向け',
-      tags: ['エンタメ','夜景','ショッピング']
-    },
-    {
-      name: 'みなとみらい・横浜中華街',
-      emoji: '⚓',
-      pref: '神奈川県',
-      note: '港町の絶景と本格中華グルメ。散歩も映えも楽しめる',
-      tags: ['グルメ','景色','散歩']
-    },
-    {
-      name: '鎌倉・江ノ島',
-      emoji: '⛩️',
-      pref: '神奈川県',
-      note: '歴史ある寺社と海岸線。鎌倉大仏・江ノ電・しらす丼が名物',
-      tags: ['歴史','自然','グルメ']
-    },
-    {
-      name: '川越・秩父',
-      emoji: '🏚️',
-      pref: '埼玉県',
-      note: '「小江戸」川越の蔵造り街並みと、秩父の山岳・温泉・ジビエ料理',
-      tags: ['歴史','自然','温泉']
-    },
-    {
-      name: '日光・那須',
-      emoji: '🌿',
-      pref: '栃木県',
-      note: '世界遺産・東照宮、華厳の滝、那須高原の大自然と温泉',
-      tags: ['歴史','自然','温泉']
-    },
-    {
-      name: '草津・みなかみ',
-      emoji: '♨️',
-      pref: '群馬県',
-      note: '日本有数の草津温泉と、みなかみのラフティング・紅葉が名物',
-      tags: ['温泉','アクティビティ','自然']
-    },
-    {
-      name: '大洗・水戸・偕楽園',
-      emoji: '🌊',
-      pref: '茨城県',
-      note: '梅の名所・偕楽園、大洗の海鮮・アンコウ鍋が絶品',
-      tags: ['自然','グルメ','歴史']
-    },
-  ];
-
-  // Bracket: indices into SPOTS array
-  // Round 1 matches: (0v1),(2v3),(4v5),(6v7) → 4 winners
-  // Round 2: winner[0]v winner[1], winner[2]v winner[3] → 2 winners
-  // Round 3: winner[0]v winner[1] → champion
-  let bracket = [...SPOTS.keys()]; // [0,1,2,3,4,5,6,7]
-  let roundWinners = [];
-  let currentMatch = 0;
-  let currentRoundMatches = [[0,1],[2,3],[4,5],[6,7]];
-  let round = 1;
-  let totalStep = 0;
-  const TOTAL_STEPS = 7;
-
-  function getRoundLabel(r) {
-    return r === 1 ? '1回戦' : r === 2 ? '準決勝' : '決勝';
+const SPOTS = [
+  {
+    id: 'kusatsu',
+    name: '草津温泉',
+    area: '吾妻郡草津町',
+    cat: '温泉',
+    emoji: '♨️',
+    grad: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)',
+    desc: '日本一の湧出量を誇る名湯。湯畑を中心に温泉街が広がり「西の河原公園」の絶景露天風呂も必見'
+  },
+  {
+    id: 'ikaho',
+    name: '伊香保温泉',
+    area: '渋川市',
+    cat: '温泉',
+    emoji: '🪜',
+    grad: 'linear-gradient(135deg, #f9ca24 0%, #f0932b 100%)',
+    desc: '365段の石段街が有名。黄金の湯・白銀の湯の2源泉を持ち、石段沿いに旅館や土産物店が立ち並ぶ'
+  },
+  {
+    id: 'shima',
+    name: '四万温泉',
+    area: '吾妻郡中之条町',
+    cat: '温泉',
+    emoji: '🏮',
+    grad: 'linear-gradient(135deg, #4ecdc4 0%, #1a6b6b 100%)',
+    desc: '「千と千尋の神隠し」のモデルとも言われる温泉郷。四万川沿いの緑豊かな渓谷が絶景'
+  },
+  {
+    id: 'tomioka',
+    name: '富岡製糸場',
+    area: '富岡市',
+    cat: '世界遺産',
+    emoji: '🏭',
+    grad: 'linear-gradient(135deg, #c8a96e 0%, #7a5230 100%)',
+    desc: '2014年世界遺産登録。明治5年創業の日本最初の官営模範製糸場でフランス式の煉瓦建築が今も残る'
+  },
+  {
+    id: 'tanigawa',
+    name: '谷川岳',
+    area: '利根郡みなかみ町',
+    cat: '自然',
+    emoji: '⛰️',
+    grad: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)',
+    desc: '標高1,977mの名峰。ロープウェイで天神平まで行け、紅葉シーズンの絶景が格別。岩壁登攀の聖地'
+  },
+  {
+    id: 'minakami',
+    name: 'みなかみ（水上）',
+    area: '利根郡みなかみ町',
+    cat: 'アクティビティ',
+    emoji: '🌊',
+    grad: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+    desc: '利根川でのラフティング・カヌーが人気。諏訪峡の紅葉も美しく温泉とアクティビティ両方楽しめる'
+  },
+  {
+    id: 'haruna',
+    name: '榛名山・榛名湖',
+    area: '高崎市',
+    cat: '自然',
+    emoji: '🌋',
+    grad: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
+    desc: '上毛三山のひとつ。カルデラ湖の榛名湖に映る逆さ富士が絶景。春のヤマツツジの群生も圧巻'
+  },
+  {
+    id: 'fukiware',
+    name: '吹割の滝',
+    area: '沼田市',
+    cat: '自然',
+    emoji: '💧',
+    grad: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
+    desc: '「東洋のナイアガラ」と称される奇瀑。川の中に割れ目があり水が地面に吸い込まれるように流れ落ちる'
+  },
+  {
+    id: 'myogi',
+    name: '妙義山',
+    area: '富岡市・安中市',
+    cat: '自然',
+    emoji: '🗻',
+    grad: 'linear-gradient(135deg, #2d5016 0%, #4a7c59 100%)',
+    desc: '奇岩怪石が連なる上毛三山のひとつ。白雲山・金洞山・金鶏山の三峰からなり紅葉の名所としても有名'
+  },
+  {
+    id: 'akagi',
+    name: '赤城山',
+    area: '前橋市・渋川市',
+    cat: '自然',
+    emoji: '🌄',
+    grad: 'linear-gradient(135deg, #f83600 0%, #f9d423 100%)',
+    desc: '大沼・小沼の美しい湖沼群を持つ上毛三山のひとつ。冬はワカサギ釣り、春は新緑と四季通じて楽しめる'
   }
+];
 
-  function renderMatch() {
-    if (currentMatch >= currentRoundMatches.length) {
-      // Move to next round
-      round++;
-      const w = roundWinners;
-      roundWinners = [];
-      if (w.length === 1) {
-        showResult(w[0]);
-        return;
-      }
-      currentRoundMatches = [];
-      for (let i = 0; i < w.length; i += 2) {
-        currentRoundMatches.push([w[i], w[i+1]]);
-      }
-      currentMatch = 0;
-    }
+let checked = [];
+try {
+  checked = JSON.parse(localStorage.getItem('gunma-checked') || '[]');
+} catch(e) { checked = []; }
 
-    totalStep = (round === 1 ? 0 : round === 2 ? 4 : 6) + currentMatch;
-    const [ia, ib] = currentRoundMatches[currentMatch];
-    const a = SPOTS[ia], b = SPOTS[ib];
+function save() {
+  try { localStorage.setItem('gunma-checked', JSON.stringify(checked)); } catch(e) {}
+}
 
-    document.getElementById('roundLabel').textContent = getRoundLabel(round);
-    document.getElementById('stepLabel').textContent = `第${totalStep + 1}問`;
-    document.getElementById('stepCount').textContent = `${totalStep + 1} / ${TOTAL_STEPS}`;
-    document.getElementById('progressFill').style.width = `${(totalStep / TOTAL_STEPS) * 100}%`;
+function updateProgress() {
+  const n = checked.length, total = SPOTS.length;
+  const pct = Math.round(n / total * 100);
+  document.getElementById('checkedCount').textContent = n + ' / ' + total + ' チェック済み';
+  document.getElementById('checkedPct').textContent = pct + '%';
+  document.getElementById('progFill').style.width = pct + '%';
+}
 
-    renderBtn('choiceA', a);
-    renderBtn('choiceB', b);
-
-    const el = document.getElementById('choicesEl');
-    el.classList.remove('animate');
-    void el.offsetWidth;
-    el.classList.add('animate');
+function toggleCheck(id) {
+  if (checked.includes(id)) {
+    checked = checked.filter(function(c) { return c !== id; });
+  } else {
+    checked.push(id);
   }
+  save();
+  const card = document.getElementById('card-' + id);
+  card.classList.toggle('checked', checked.includes(id));
+  card.querySelector('.check-btn').textContent = checked.includes(id) ? '✓' : '';
+  updateProgress();
+}
 
-  function renderBtn(id, spot) {
-    const el = document.getElementById(id);
-    el.innerHTML = `
-      <span class="emoji">${spot.emoji}</span>
-      <div class="name">${spot.name}</div>
-      <div class="pref">${spot.pref}</div>
-      <div class="note">${spot.note}</div>
-    `;
-  }
+function filterBy(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  SPOTS.forEach(function(s) {
+    const card = document.getElementById('card-' + s.id);
+    if (!card) return;
+    card.classList.toggle('hidden', cat !== 'all' && s.cat !== cat);
+  });
+}
 
-  function choose(side) {
-    const [ia, ib] = currentRoundMatches[currentMatch];
-    const winner = side === 0 ? ia : ib;
-    roundWinners.push(winner);
-    currentMatch++;
-    renderMatch();
-  }
+function resetAll() {
+  if (!confirm('チェックをすべてリセットしますか？')) return;
+  checked = [];
+  save();
+  SPOTS.forEach(function(s) {
+    const card = document.getElementById('card-' + s.id);
+    card.classList.remove('checked');
+    card.querySelector('.check-btn').textContent = '';
+  });
+  updateProgress();
+}
 
-  function showResult(idx) {
-    const spot = SPOTS[idx];
-    document.getElementById('resultEmoji').textContent = spot.emoji;
-    document.getElementById('resultPref').textContent = spot.pref;
-    document.getElementById('resultSpot').textContent = spot.name;
-    document.getElementById('resultNote').textContent = spot.note;
-    document.getElementById('progressFill').style.width = '100%';
-    document.getElementById('stepCount').textContent = `${TOTAL_STEPS} / ${TOTAL_STEPS}`;
+function buildGrid() {
+  const grid = document.getElementById('grid');
+  SPOTS.forEach(function(s) {
+    const isChecked = checked.includes(s.id);
+    const card = document.createElement('div');
+    card.className = 'spot-card' + (isChecked ? ' checked' : '');
+    card.id = 'card-' + s.id;
 
-    document.getElementById('quizSection').classList.add('hide');
-    const res = document.getElementById('resultSection');
-    res.classList.add('show');
-    res.classList.remove('animate');
-    void res.offsetWidth;
-    res.classList.add('animate');
-  }
+    const photo = document.createElement('div');
+    photo.className = 'photo';
+    photo.style.background = s.grad;
 
-  function reset() {
-    round = 1;
-    currentMatch = 0;
-    roundWinners = [];
-    totalStep = 0;
-    currentRoundMatches = [[0,1],[2,3],[4,5],[6,7]];
+    const emoji = document.createElement('div');
+    emoji.className = 'photo-emoji';
+    emoji.textContent = s.emoji;
 
-    document.getElementById('resultSection').classList.remove('show');
-    document.getElementById('quizSection').classList.remove('hide');
-    renderMatch();
-  }
+    const badge = document.createElement('div');
+    badge.className = 'cat-badge';
+    badge.textContent = s.cat;
 
-  // Start
-  renderMatch();
+    const checkBtn = document.createElement('div');
+    checkBtn.className = 'check-btn';
+    checkBtn.textContent = isChecked ? '✓' : '';
+
+    photo.appendChild(emoji);
+    photo.appendChild(badge);
+
+    const info = document.createElement('div');
+    info.className = 'info';
+    info.innerHTML =
+      '<div class="spot-name">' + s.name + '</div>' +
+      '<div class="spot-area">📍 ' + s.area + '</div>' +
+      '<div class="spot-desc">' + s.desc + '</div>';
+
+    card.appendChild(photo);
+    card.appendChild(checkBtn);
+    card.appendChild(info);
+
+    card.addEventListener('click', function() { toggleCheck(s.id); });
+
+    grid.appendChild(card);
+  });
+}
+
+buildGrid();
+updateProgress();
 </script>
 </body>
 </html>
